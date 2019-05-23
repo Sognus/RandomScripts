@@ -20,7 +20,7 @@ def setup_parser():
     parser.add_argument('-m', '--minecraft', help="Minecraft version", metavar="minecraft version")
     parser.add_argument("--latest", "-l", help="Use latest build", action="store_true", default=True)
     parser.add_argument("--latest-version", "-L", help="Use latest minecraft version", action="store_true", default=True)
-    parser.add_argument("--build", "-b", help="Specify PaperMC build", choices=["latest", int], metavar="[int|latest]")
+    parser.add_argument("--build", "-b", help="Specify PaperMC build", type=int, metavar="[int|latest]")
     return parser.parse_args()
 
 class Updater:
@@ -145,7 +145,7 @@ class Updater:
         download = requests.get("{}/{}/{}/download".format(PAPER_API_URL, mc_version, build))
         print("Downloading build {}/{}".format(mc_version, build))
         if download.status_code != 200:
-            print("Build {}/{} could not be downloaded!".format(mc_version, build))
+            print("Build {}/{} could not be downloaded! (CODE = {})".format(mc_version, build, download.status_code))
             return
         with open("paper-{}-{}.jar".format(mc_version, build), "wb") as f:
             f.write(download.content)
@@ -154,8 +154,7 @@ class Updater:
 
 if __name__ == '__main__':
     args = setup_parser()
-    print(args)
-
+    #print(args)
     updater = Updater(args.minecraft, args.build, args.latest, args.latest_version)
     updater.job()
     exit(0)
